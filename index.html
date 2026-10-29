@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Borderline Transit Hub: class maps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E9EDF0; --ink:#1C2630; --muted:#56636E; --panel:#FFFFFF; --line:#C9D1D7; --soft:#F3F5F7;
+  --land-city:#F8F9F7; --land-county:#EAF0E6; --street:#D8DDE0; --main:#BCC4CA; --rail:#66717B; --edge:#2B3640; --label:#7A8590;
+  --rep:#C2362B; --unrep:#E08A1E; --ai:#6B4BC4; --fp:#98A1A8;
+  --city:#2F6DB5; --sheriff:#3E8A4E; --heat:#D7432F; --mA:#E0A015; --mB:#17979A; --lamp:#E8B820; --flag:#B26A00; --flagbg:#FFF3DC;
+  --focus:#2F6DB5;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131920; --ink:#E5EAEE; --muted:#9AA6B0; --panel:#1B232B; --line:#2E3A45; --soft:#212B34;
+    --land-city:#222B33; --land-county:#1E2A23; --street:#34414B; --main:#43525D; --rail:#8D99A3; --edge:#D7DEE3; --label:#8C98A2;
+    --rep:#F0604F; --unrep:#F2A23A; --ai:#A98BF5; --fp:#6E7A84;
+    --city:#6FA3E8; --sheriff:#6CC07E; --heat:#FF6A4D; --mA:#F2BC3A; --mB:#3CC6C6; --lamp:#F5CF4A; --flag:#F2B54D; --flagbg:#3A2E14;
+    --focus:#8DB8F2;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131920; --ink:#E5EAEE; --muted:#9AA6B0; --panel:#1B232B; --line:#2E3A45; --soft:#212B34;
+  --land-city:#222B33; --land-county:#1E2A23; --street:#34414B; --main:#43525D; --rail:#8D99A3; --edge:#D7DEE3; --label:#8C98A2;
+  --rep:#F0604F; --unrep:#F2A23A; --ai:#A98BF5; --fp:#6E7A84;
+  --city:#6FA3E8; --sheriff:#6CC07E; --heat:#FF6A4D; --mA:#F2BC3A; --mB:#3CC6C6; --lamp:#F5CF4A; --flag:#F2B54D; --flagbg:#3A2E14;
+  --focus:#8DB8F2;
+  color-scheme: dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:17px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 60px}
+header.case{display:grid;grid-template-columns:1.1fr 1fr;gap:28px;align-items:end;padding:18px 0 30px;border-bottom:2px solid var(--edge)}
+h1{font-size:clamp(34px,5vw,56px);line-height:1.02;letter-spacing:-0.02em;margin:0;font-weight:800}
+.sub{color:var(--muted);margin:10px 0 0;max-width:46ch}
+.brief{font-size:16px;max-width:60ch}
+.brief p{margin:0 0 10px}
+.brief strong{font-weight:700}
+.note{font-size:14px;color:var(--muted)}
+nav.jump{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 0}
+nav.jump a{color:var(--ink);text-decoration:none;border:1.5px solid var(--edge);padding:6px 12px;border-radius:999px;font-weight:600;font-size:15px}
+nav.jump a:hover{background:var(--panel)}
+section.q{padding:40px 0 20px;border-bottom:1px solid var(--line)}
+.qhead{display:flex;align-items:baseline;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.qnum{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:600;font-size:64px;line-height:.8;color:var(--edge)}
+h2{font-size:28px;margin:0;letter-spacing:-0.01em}
+.qhead p{margin:4px 0 0;color:var(--muted);flex-basis:100%}
+.grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:22px;align-items:start}
+.mapbox{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px}
+svg.map{display:block;width:100%;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:14px;color:var(--muted);padding:8px 4px 2px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:50%}
+@media (min-width:861px){.grid>.mapbox{position:sticky;top:calc(12px + env(safe-area-inset-top,0px))}}
+.side{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px 18px}
+.card h3{margin:0 0 10px;font-size:17px}
+.card ol{margin:0;padding-left:20px}
+.card li{margin-bottom:6px}
+.toggles{display:flex;flex-direction:column;gap:8px}
+button{font:inherit;cursor:pointer}
+.tg{display:flex;align-items:center;gap:10px;text-align:left;background:var(--soft);color:var(--ink);border:1.5px solid var(--line);border-radius:6px;padding:9px 12px;font-size:15px;font-weight:600}
+.tg .box{width:18px;height:18px;border-radius:4px;border:2px solid var(--muted);flex:none;display:grid;place-items:center}
+.tg[aria-pressed="true"]{border-color:var(--edge);background:var(--panel)}
+.tg[aria-pressed="true"] .box{background:var(--edge);border-color:var(--edge)}
+.tg[aria-pressed="true"] .box::after{content:"";width:8px;height:5px;border-left:2px solid var(--panel);border-bottom:2px solid var(--panel);transform:rotate(-45deg) translate(1px,-1px)}
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1.5px solid var(--edge);border-radius:6px;overflow:hidden}
+.seg button{background:transparent;color:var(--ink);border:0;padding:10px;font-weight:600;font-size:15px}
+.seg button[aria-pressed="true"]{background:var(--edge);color:var(--panel)}
+button:focus-visible,a:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:700;color:var(--muted);font-size:13.5px}
+td.n{font-variant-numeric:tabular-nums;font-weight:700}
+.reveal{background:var(--edge);color:var(--panel);border:0;border-radius:6px;padding:11px 14px;font-weight:700;font-size:15px;text-align:left}
+.prompt{display:none;border-left:4px solid var(--edge);padding:12px 16px;background:var(--panel);border-radius:0 6px 6px 0;font-size:16.5px}
+.prompt.show{display:block}
+.prompt p{margin:0 0 8px}
+.prompt p:last-child{margin:0}
+.records{margin-top:22px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.scroll{overflow-x:auto}
+.rec h4{margin:0 0 8px;font-size:15px}
+.mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:13.5px}
+.merged{display:none;margin-top:16px}
+.merged.show{display:block}
+.flag{background:var(--flagbg);color:var(--flag);font-weight:600}
+.actions{display:none;font-size:15px}
+.actions.show{display:block}
+.actions ul{margin:6px 0 0;padding-left:18px}
+.stat{display:flex;gap:18px;flex-wrap:wrap;font-size:15px}
+.stat b{font-size:26px;display:block;line-height:1.1;font-variant-numeric:tabular-nums}
+.steps{display:flex;flex-direction:column;gap:14px}
+.step{display:grid;grid-template-columns:30px 1fr;gap:10px}
+.sn{width:28px;height:28px;border-radius:50%;background:var(--edge);color:var(--panel);display:grid;place-items:center;font-weight:800;font-size:15px}
+.step h4{margin:2px 0 4px;font-size:16px}
+.step p{margin:0 0 6px;font-size:15.5px}
+.do{color:var(--muted)}
+.ask{font-weight:600}
+footer{padding-top:28px;color:var(--muted);font-size:14px}
+@media (max-width:860px){
+  header.case,.grid,.records{grid-template-columns:1fr}
+  .qnum{font-size:48px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .pt{transition:opacity .25s}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="case">
+  <div>
+    <h1>The Borderline Transit Hub</h1>
+    <p class="sub">You are a team of crime analysts. Work through the three maps in order. Each map has three steps: look, explain, decide. Everything here is made up, but every problem in it happens in real cities.</p>
+    <nav class="jump" aria-label="Jump to a map">
+      <a href="#q1">Map 1</a>
+      <a href="#q2">Map 2</a>
+      <a href="#q3">Map 3</a>
+    </nav>
+  </div>
+  <div class="brief">
+    <p>A busy train station and the neighborhoods around it are seeing more street robberies. The mayor wants to know where the problem is, why it’s happening, and whether the city should buy AI tools to help.</p>
+    <p>Your job: look closely at the data before you trust it.</p>
+  </div>
+</header>
+
+<!-- ============ MAP 1 ============ -->
+<section class="q" id="q1">
+  <div class="qhead">
+    <span class="qnum">1</span>
+    <h2>Robberies by neighborhood</h2>
+  </div>
+  <div class="grid">
+    <div class="mapbox"><svg class="map" id="map1" viewBox="0 0 640 440" role="img" aria-label="Map of robberies in Ridge Heights, Harbor Flats and around the train station"></svg>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--rep)"></i>Robbery reported to police</span>
+        <span><i class="sw" style="border:2.5px solid var(--unrep)"></i>Robbery from the victim survey</span>
+      </div>
+    </div>
+    <div class="side">
+      <div class="card">
+        <h3>About the neighborhoods</h3>
+        <p style="margin:0 0 8px"><strong>Ridge Heights:</strong> mostly homeowners. Residents are very active on neighborhood social media.</p>
+        <p style="margin:0 0 8px"><strong>Harbor Flats:</strong> mostly renters. Many residents speak limited English.</p>
+        <p style="margin:0" class="note">The victim survey asked a sample of households whether they were robbed this year, whether or not they called the police.</p>
+      </div>
+      <div class="card">
+        <h3>Layers</h3>
+        <div class="toggles" id="tg1"></div>
+      </div>
+      <div class="card steps">
+        <div class="step"><span class="sn">1</span><div><h4>Look</h4>
+          <p class="do">Turn on only “Police reports.”</p>
+          <p class="ask">Which neighborhood would you tell the mayor is safest? Now add the victim survey. Would you change your answer?</p></div></div>
+        <div class="step"><span class="sn">2</span><div><h4>Explain</h4>
+          <p class="ask">Why would the police map and the survey disagree? Use the neighborhood descriptions above. Which kinds of crime do you think are most likely to be missing from police data in real life?</p></div></div>
+        <div class="step"><span class="sn">3</span><div><h4>Decide</h4>
+          <p class="ask">What tools, strategies or AI tools could help a police department include the robberies that never get reported? For each idea, what might it miss, and who might it affect?</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MAP 2 ============ -->
+<section class="q" id="q2">
+  <div class="qhead">
+    <span class="qnum">2</span>
+    <h2>Robberies near the station</h2>
+  </div>
+  <div class="grid">
+    <div class="mapbox"><svg class="map" id="map2" viewBox="0 0 640 440" role="img" aria-label="Map of robberies near the station colored by which agency recorded them"></svg>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--city)"></i>City PD record</span>
+        <span><i class="sw" style="background:var(--sheriff)"></i>Sheriff record</span>
+        <span><i class="sw" style="background:var(--heat);opacity:.55;border-radius:2px"></i>Hotspot</span>
+      </div>
+    </div>
+    <div class="side">
+      <div class="card">
+        <h3>Layers</h3>
+        <div class="toggles" id="tg2"></div>
+      </div>
+      <div class="card">
+        <h3>Record count</h3>
+        <div class="stat" id="s2"></div>
+      </div>
+      <div class="card steps">
+        <div class="step"><span class="sn">1</span><div><h4>Look</h4>
+          <p class="do">Turn on the hotspot with only City data. Mark where the peak is. Then add Sheriff data.</p>
+          <p class="ask">What happened to the hotspot? If you were the City analyst, what would you have told your chief before seeing the Sheriff data?</p></div></div>
+        <div class="step"><span class="sn">2</span><div><h4>Explain</h4>
+          <p class="do">Read the six records below the map.</p>
+          <p class="ask">How many different robberies do these six records describe? List every difference between the two systems you can find. Why might two agencies next to each other not share their data?</p></div></div>
+        <div class="step"><span class="sn">3</span><div><h4>Decide</h4>
+          <p class="do">Click “Run the AI merge.”</p>
+          <p class="ask">Would you let this AI combine the two databases? Which of its decisions would you accept, and which would you want a person to check? If the AI gets one wrong, who is responsible?</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="records">
+    <div class="card rec">
+      <h4>City PD records system</h4>
+      <div class="scroll"><table class="mono">
+        <tr><th>Case</th><th>Date / time</th><th>Type</th><th>Location</th><th>Victim</th></tr>
+        <tr><td>CPD-1187</td><td>10/03/2026 21:40</td><td>ROB-ST</td><td>1400 Main St</td><td>Female, 34</td></tr>
+        <tr><td>CPD-1192</td><td>10/04/2026 23:05</td><td>ROB-ARM</td><td>Station Plz N entrance</td><td>Male, 19</td></tr>
+        <tr><td>CPD-1201</td><td>10/09/2026 18:20</td><td>ROB-ST</td><td>9th Ave &amp; Rail</td><td>Male, 157</td></tr>
+      </table></div>
+    </div>
+    <div class="card rec">
+      <h4>County Sheriff records system</h4>
+      <div class="scroll"><table class="mono">
+        <tr><th>Case</th><th>Date / time</th><th>Type</th><th>Location</th><th>Victim</th></tr>
+        <tr><td>SO-77</td><td>03-10-26 2140</td><td>PC 211</td><td>1400 MAIN STREET</td><td>SEX 2 · AGE 34</td></tr>
+        <tr><td>SO-81</td><td>06-10-26 0115</td><td>STRONG-ARM/PURSE</td><td>MILL ALY &amp; 9TH</td><td>SEX 0 · AGE —</td></tr>
+        <tr><td>SO-84</td><td>08-10-26 2250</td><td>PC 211</td><td>STATION PLAZA</td><td>SEX 1 · AGE 22</td></tr>
+      </table></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <button class="tg" id="mergeBtn" aria-pressed="false" style="width:100%"><span class="box"></span>Run the AI merge</button>
+    <div class="merged" id="merged">
+      <div class="scroll"><table>
+        <tr><th>Records</th><th>What the AI did</th><th>AI confidence</th></tr>
+        <tr><td>CPD-1187 + SO-77</td><td>Treated as one robbery: same time, address and victim age.</td><td class="n">91%</td></tr>
+        <tr><td>SO-81</td><td>Read the date as October 6. Labeled it a robbery. Changed victim sex “0” to “unknown.”</td><td class="n">62%</td></tr>
+        <tr><td>CPD-1201</td><td>Changed victim age 157 to 57.</td><td class="n">55%</td></tr>
+        <tr><td>CPD-1192</td><td>Kept as is.</td><td class="n">98%</td></tr>
+        <tr><td>SO-84</td><td>Kept; changed “SEX 1” to “male.”</td><td class="n">88%</td></tr>
+      </table></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MAP 3 ============ -->
+<section class="q" id="q3">
+  <div class="qhead">
+    <span class="qnum">3</span>
+    <h2>Eight weeks at the station</h2>
+  </div>
+  <div class="grid">
+    <div class="mapbox"><svg class="map" id="map3" viewBox="0 0 640 440" role="img" aria-label="Map of robberies over eight weeks near the station"></svg>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--rep)"></i>Robbery</span>
+        <span><i class="sw" style="border:2px dashed var(--city)"></i>Extra City patrols (from week 5)</span>
+        <span><i class="sw" style="background:var(--lamp)"></i>Working streetlight</span>
+        <span><i class="sw" style="background:var(--mA);opacity:.6"></i>Model A forecast</span>
+        <span><i class="sw" style="background:var(--mB);opacity:.6"></i>Model B forecast</span>
+      </div>
+    </div>
+    <div class="side">
+      <div class="card">
+        <h3>What happened</h3>
+        <p style="margin:0 0 8px">After the City saw the robbery hotspot at the Train Station, it <strong>added extra police patrols around the station starting in week 5</strong>. The patrol zone is the blue dashed area on the map.</p>
+        <p style="margin:0" class="note">The patrols stayed on the City Police side of the line. Nothing else changed in the neighborhood.</p>
+      </div>
+      <div class="card">
+        <h3>Time</h3>
+        <div class="seg" id="seg3">
+          <button aria-pressed="true" data-w="before">Weeks 1–4<br><span style="font-weight:500;font-size:13px">before extra patrols</span></button>
+          <button aria-pressed="false" data-w="after">Weeks 5–8<br><span style="font-weight:500;font-size:13px">after extra patrols</span></button>
+        </div>
+        <div class="stat" id="s3" style="margin-top:12px"></div>
+      </div>
+      <div class="card">
+        <h3>Layers</h3>
+        <div class="toggles" id="tg3"></div>
+        <div class="actions" id="actA"><strong style="color:var(--mA)">Model A.</strong> Uses: five years of arrest records. Suggests: more patrols at the station and in Harbor Flats.</div>
+        <div class="actions" id="actB"><strong style="color:var(--mB)">Model B.</strong> Uses: streetlight outage reports, foot traffic measured from people’s phone location data, and station exits. Suggests: repair lights on Mill Alley, share alerts with the Sheriff, put an attendant at the north exit.</div>
+      </div>
+      <div class="card steps">
+        <div class="step"><span class="sn">1</span><div><h4>Look</h4>
+          <p class="do">Click weeks 1–4 (before extra patrols), then weeks 5–8 (after extra patrols). Switch back and forth a few times.</p>
+          <p class="ask">What changed at the Train Station? What changed somewhere else on the map? Compare the three counts. The City says its patrols worked. Do you agree?</p></div></div>
+        <div class="step"><span class="sn">2</span><div><h4>Explain</h4>
+          <p class="do">Turn on streetlights.</p>
+          <p class="ask">Why did robbery show up where it did in weeks 5–8? Who is responsible for that area? What would you do next if you were the City, and what if you were the Sheriff?</p></div></div>
+        <div class="step"><span class="sn">3</span><div><h4>Decide</h4>
+          <p class="do">Turn on Model A, then Model B. Read what each one uses and suggests.</p>
+          <p class="ask">If the city could buy only one, which would you choose? What does each model get right, and what does each risk? Is there a version you’d trust more than either?</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="q" id="wrap" style="border-bottom:0">
+  <div class="qhead"><h2>Bring it together</h2></div>
+  <div class="card" style="max-width:780px">
+    <ol>
+      <li>You saw three AI tools today: the scan, the merge and the forecasts. Rank them from most to least trustworthy, and explain your top and bottom choices.</li>
+      <li>In all three maps, what did the data miss, and would AI have fixed it on its own?</li>
+      <li>Write one rule the city should follow before using any AI tool on crime data.</li>
+    </ol>
+  </div>
+</section>
+
+<footer>All locations, records and numbers are fictional and generated for classroom discussion. Based on themes from <em>Fundamentals of Crime Mapping</em>, chapters 3, 6 and 7.</footer>
+</div>
+
+<script>
+(function(){
+const NS="http://www.w3.org/2000/svg";
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function gauss(r){let u=0,v=0;while(u===0)u=r();while(v===0)v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const BORDER=[[330,0],[330,170],[322,210],[338,250],[338,440]];
+function borderX(y){for(let i=0;i<BORDER.length-1;i++){const[a,b]=[BORDER[i],BORDER[i+1]];if(y>=a[1]&&y<=b[1]){const t=(y-a[1])/(b[1]-a[1]||1);return a[0]+t*(b[0]-a[0]);}}return 338;}
+const isCity=p=>p.x<borderX(p.y);
+
+function baseMap(svg,opts){
+  const g=el("g",{},svg);
+  const pts=BORDER.map(p=>p.join(",")).join(" L");
+  el("path",{d:"M0,0 L"+pts+" L0,440 Z",fill:"var(--land-city)"},g);
+  el("path",{d:"M640,0 L"+pts+" L640,440 Z",fill:"var(--land-county)"},g);
+  if(opts.hoods){
+    el("rect",{x:40,y:30,width:240,height:140,rx:10,fill:"none",stroke:"var(--label)","stroke-dasharray":"2 5","stroke-width":1.2},g);
+    el("rect",{x:40,y:262,width:240,height:150,rx:10,fill:"none",stroke:"var(--label)","stroke-dasharray":"2 5","stroke-width":1.2},g);
+  }
+  for(let x=40;x<=620;x+=64){el("line",{x1:x,y1:0,x2:x,y2:440,stroke:(x===168||x===488)?"var(--main)":"var(--street)","stroke-width":(x===168||x===488)?5:2.2},g);}
+  for(let y=46;y<=440;y+=64){if(y===206)continue;el("line",{x1:0,y1:y,x2:640,y2:y,stroke:(y===110||y===302)?"var(--main)":"var(--street)","stroke-width":(y===110||y===302)?5:2.2},g);}
+  // Mill Alley
+  el("line",{x1:404,y1:334,x2:476,y2:334,stroke:"var(--street)","stroke-width":2,"stroke-dasharray":"4 3"},g);
+  // rail
+  el("line",{x1:0,y1:210,x2:640,y2:210,stroke:"var(--rail)","stroke-width":3},g);
+  for(let x=6;x<640;x+=12)el("line",{x1:x,y1:205,x2:x,y2:215,stroke:"var(--rail)","stroke-width":1.2},g);
+  el("rect",{x:304,y:197,width:52,height:26,rx:3,fill:"var(--panel)",stroke:"var(--edge)","stroke-width":2},g);
+  const gl=el("g",{"pointer-events":"none"});svg._labels=gl;
+  const lab=(x,y,t,o={})=>{const e=el("text",Object.assign({x,y,"font-family":"Public Sans, Arial, sans-serif","font-size":14,"font-weight":700,fill:"var(--ink)","text-anchor":"middle",stroke:"var(--panel)","stroke-width":4,"paint-order":"stroke","stroke-linejoin":"round"},o),gl);e.textContent=t;return e;};
+  el("polyline",{points:BORDER.map(p=>p.join(",")).join(" "),fill:"none",stroke:"var(--edge)","stroke-width":2.5,"stroke-dasharray":"9 5"},g);
+  // street names
+  const st=(x,y,t,rot)=>lab(x,y,t,Object.assign({"font-size":11,"font-weight":600,fill:"var(--label)"},rot?{transform:`rotate(-90 ${x} ${y})`}:{}));
+  st(590,105,"Ridge Rd");st(590,297,"Main St");st(419,150,"9th Ave",true);st(163,150,"Harbor Ave",true);st(483,150,"Lake Ave",true);st(70,226,"Rail line");
+  // area names
+  lab(330,190,"Train Station",{"font-size":14});
+  lab(160,22,"CITY POLICE side",{fill:"var(--city)","font-size":15});
+  lab(490,22,"COUNTY SHERIFF side",{fill:"var(--sheriff)","font-size":15});
+  lab(440,356,"Mill Alley",{"font-size":13});
+  el("line",{x1:338,y1:262,x2:338,y2:262},g);
+  lab(372,436,"City / County line",{"font-size":11,fill:"var(--edge)","text-anchor":"start"});
+  if(opts.hoods){lab(160,50,"Ridge Heights",{"font-size":17});lab(160,284,"Harbor Flats",{"font-size":17});}
+  const top=el("g",{},svg);return top;
+}
+
+function makeToggle(container,label,on,cb){
+  const b=document.createElement("button");b.className="tg";b.setAttribute("aria-pressed",on);b.innerHTML='<span class="box"></span>'+label;
+  b.addEventListener("click",()=>{const v=b.getAttribute("aria-pressed")!=="true";b.setAttribute("aria-pressed",v);cb(v);});
+  container.appendChild(b);return b;
+}
+function diamond(g,x,y,fill){return el("rect",{x:x-4,y:y-4,width:8,height:8,fill,transform:`rotate(45 ${x} ${y})`},g);}
+function cross(g,x,y){const s=el("g",{stroke:"var(--fp)","stroke-width":2.4,"stroke-linecap":"round"},g);el("line",{x1:x-4,y1:y-4,x2:x+4,y2:y+4},s);el("line",{x1:x-4,y1:y+4,x2:x+4,y2:y-4},s);return s;}
+
+/* ---------- Q1 ---------- */
+(function(){
+  const svg=document.getElementById("map1");const top=baseMap(svg,{hoods:true});
+  const r=rng(7);
+  const areas=[
+    {k:"ridge",name:"Ridge Heights",cx:160,cy:100,sx:55,sy:30,n:11,pR:.82,pA:.75,fp:6},
+    {k:"station",name:"Station area",cx:330,cy:222,sx:30,sy:22,n:22,pR:.5,pA:.4,fp:2},
+    {k:"harbor",name:"Harbor Flats",cx:160,cy:340,sx:58,sy:34,n:26,pR:.23,pA:.08,fp:0}
+  ];
+  const pts=[];
+  areas.forEach(a=>{a.c={all:0,rep:0,ai:0,fp:0};
+    for(let i=0;i<a.n;i++){const x=clamp(a.cx+gauss(r)*a.sx,48,620),y=clamp(a.cy+gauss(r)*a.sy,40,408);const rep=r()<a.pR;const ai=!rep&&r()<a.pA;pts.push({x,y,rep,ai,a:a.k});a.c.all++;if(rep)a.c.rep++;if(ai)a.c.ai++;}
+    for(let i=0;i<a.fp;i++){const x=clamp(a.cx+gauss(r)*a.sx,48,620),y=clamp(a.cy+gauss(r)*a.sy,40,408);pts.push({x,y,fp:true,a:a.k});a.c.fp++;}
+  });
+  const gRep=el("g",{},top),gUn=el("g",{},top),gAI=el("g",{},top);
+  pts.forEach(p=>{
+    if(p.fp){p.d=diamond(gAI,p.x,p.y,"var(--ai)");p.x2=cross(gAI,p.x,p.y);p.x2.style.display="none";}
+    else if(p.rep)el("circle",{cx:p.x,cy:p.y,r:4.6,fill:"var(--rep)"},gRep);
+    else{el("circle",{cx:p.x,cy:p.y,r:4.4,fill:"none",stroke:"var(--unrep)","stroke-width":2.2},gUn);if(p.ai)diamond(gAI,p.x,p.y,"var(--ai)");}
+  });
+  const st={rep:true,un:false,ai:false,chk:false};
+  function draw(){
+    gRep.style.display=st.rep?"":"none";gUn.style.display=st.un?"":"none";gAI.style.display="none";
+    return;
+    const dash="<span style='color:var(--muted)'>—</span>";
+    let h="<tr><th>Neighborhood</th><th>Reported</th><th>Victim survey</th><th>AI found</th><th>AI: not a robbery</th></tr>";
+    areas.forEach(a=>{h+=`<tr><td>${a.name}</td><td class="n">${st.rep?a.c.rep:dash}</td><td class="n">${st.un?a.c.all:dash}</td><td class="n">${st.ai?a.c.ai+(st.chk?"":" + "+a.c.fp+"?"):dash}</td><td class="n">${st.chk&&st.ai?a.c.fp:dash}</td></tr>`;});
+    t1.innerHTML=h;
+  }
+  const c=document.getElementById("tg1");
+  makeToggle(c,"Police reports",true,v=>{st.rep=v;draw();});
+  makeToggle(c,"Victim survey",false,v=>{st.un=v;draw();});
+  draw();
+})();
+
+/* ---------- Q2 ---------- */
+(function(){
+  const svg=document.getElementById("map2");const base=baseMap(svg,{hoods:true});
+  const heatG=el("g",{},base);const peakG=el("g",{},base);const top=el("g",{},base);
+  const r=rng(21);const inc=[];
+  for(let i=0;i<46;i++){inc.push({x:clamp(352+gauss(r)*34,60,620),y:clamp(218+gauss(r)*30,40,410)});}
+  for(let i=0;i<6;i++){inc.push({x:60+r()*560,y:40+r()*370});}
+  inc.forEach(p=>p.city=isCity(p));
+  // duplicates: county incidents near the border that city also recorded
+  let d=0;inc.filter(p=>!p.city).sort((a,b)=>(a.x-borderX(a.y))-(b.x-borderX(b.y))).forEach(p=>{if(d<6){p.dup=true;d++;}});
+  const gC=el("g",{},top),gS=el("g",{},top);
+  inc.forEach(p=>{
+    if(p.city)el("circle",{cx:p.x,cy:p.y,r:4.6,fill:"var(--city)"},gC);
+    else{el("circle",{cx:p.x,cy:p.y,r:4.6,fill:"var(--sheriff)"},gS);if(p.dup)el("circle",{cx:p.x-3,cy:p.y-3,r:4.6,fill:"var(--city)",stroke:"var(--panel)","stroke-width":1},gC);}
+  });
+  const st={city:true,sh:false,hot:false};
+  function visible(){const v=[];inc.forEach(p=>{if(p.city&&st.city)v.push(p);else if(!p.city){if(st.sh)v.push(p);else if(p.dup&&st.city)v.push({x:p.x-3,y:p.y-3});}});return v;}
+  function heat(){
+    heatG.innerHTML="";peakG.innerHTML="";if(!st.hot)return;
+    const v=visible();const cell=16,R=44;let best={c:0};const cells=[];
+    for(let x=0;x<640;x+=cell)for(let y=0;y<440;y+=cell){const cx=x+cell/2,cy=y+cell/2;let c=0;v.forEach(p=>{const dd=Math.hypot(p.x-cx,p.y-cy);if(dd<R)c+=1-dd/R;});cells.push({x,y,c,cx,cy});if(c>best.c)best={c,cx,cy};}
+    cells.forEach(k=>{const o=k.c/Math.max(best.c,1);if(o>.18)el("rect",{x:k.x,y:k.y,width:cell,height:cell,fill:"var(--heat)",opacity:(o*.62).toFixed(2)},heatG);});
+    el("circle",{cx:best.cx,cy:best.cy,r:11,fill:"none",stroke:"var(--edge)","stroke-width":2.5},peakG);
+    el("line",{x1:best.cx-17,y1:best.cy,x2:best.cx+17,y2:best.cy,stroke:"var(--edge)","stroke-width":2},peakG);
+    el("line",{x1:best.cx,y1:best.cy-17,x2:best.cx,y2:best.cy+17,stroke:"var(--edge)","stroke-width":2},peakG);
+    const t=el("text",{x:best.cx+16,y:best.cy-14,"font-family":"Public Sans, sans-serif","font-size":13,"font-weight":800,fill:"var(--edge)",stroke:"var(--panel)","stroke-width":4,"paint-order":"stroke"},peakG);t.textContent="Peak";
+  }
+  const s2=document.getElementById("s2");
+  const nCity=inc.filter(p=>p.city).length+inc.filter(p=>p.dup).length, nSh=inc.filter(p=>!p.city).length;
+  function stats(){
+    const dash="—";
+    s2.innerHTML=`<div>City records<b>${st.city?nCity:dash}</b></div><div>Sheriff records<b>${st.sh?nSh:dash}</b></div><div>Add them up<b>${st.city&&st.sh?nCity+nSh:dash}</b></div>`;
+  }
+  function draw(){gC.style.display=st.city?"":"none";gS.style.display=st.sh?"":"none";heat();stats();}
+  const c=document.getElementById("tg2");
+  makeToggle(c,"City PD data",true,v=>{st.city=v;draw();});
+  svg.appendChild(peakG);
+  makeToggle(c,"County Sheriff data",false,v=>{st.sh=v;draw();});
+  makeToggle(c,"Draw hotspot from visible data",false,v=>{st.hot=v;draw();});
+  draw();
+  const mb=document.getElementById("mergeBtn"),mg=document.getElementById("merged");
+  mb.addEventListener("click",()=>{const v=mb.getAttribute("aria-pressed")!=="true";mb.setAttribute("aria-pressed",v);mg.classList.toggle("show",v);});
+})();
+
+/* ---------- Q3 ---------- */
+(function(){
+  const svg=document.getElementById("map3");const base=baseMap(svg,{hoods:true});
+  const blur=el("defs",{},svg);const f=el("filter",{id:"soft",x:"-50%",y:"-50%",width:"200%",height:"200%"},blur);el("feGaussianBlur",{stdDeviation:14},f);
+  const gA=el("g",{filter:"url(#soft)",opacity:.55},base),gB=el("g",{filter:"url(#soft)",opacity:.6},base);
+  [[160,340,62],[325,214,42],[230,300,30]].forEach(c=>el("circle",{cx:c[0],cy:c[1],r:c[2],fill:"var(--mA)"},gA));
+  [[440,334,34],[522,120,28],[330,186,20]].forEach(c=>el("circle",{cx:c[0],cy:c[1],r:c[2],fill:"var(--mB)"},gB));
+  const gL=el("g",{},base);
+  const dark=[[396,484,320,348],[500,546,96,130]];
+  const isDark=(x,y)=>dark.some(d=>x>=d[0]&&x<=d[1]&&y>=d[2]&&y<=d[3]);
+  for(let x=40;x<=620;x+=64)for(let y=14;y<440;y+=32){if(!isDark(x,y))el("circle",{cx:x,cy:y,r:2.6,fill:"var(--lamp)"},gL);}
+  for(let y=46;y<=440;y+=64){if(y===206)continue;for(let x=8;x<640;x+=32){if(!isDark(x,y))el("circle",{cx:x,cy:y,r:2.6,fill:"var(--lamp)"},gL);}}
+  const patrol=el("path",{d:"M330,150 A62,62 0 1,0 330,274 L322,210 Z",fill:"var(--city)","fill-opacity":.08,stroke:"var(--city)","stroke-width":2,"stroke-dasharray":"6 4"},base);
+  const top=el("g",{},base);
+  const r=rng(33);
+  const before=[],after=[];
+  for(let i=0;i<30;i++)before.push({x:clamp(332+gauss(r)*26,40,620),y:clamp(214+gauss(r)*20,40,410)});
+  for(let i=0;i<5;i++)before.push({x:60+r()*560,y:40+r()*370});
+  for(let i=0;i<7;i++)after.push({x:clamp(334+gauss(r)*26,40,620),y:clamp(214+gauss(r)*20,40,410)});
+  for(let i=0;i<19;i++)after.push({x:clamp(442+gauss(r)*18,40,620),y:clamp(332+gauss(r)*12,40,410)});
+  for(let i=0;i<5;i++)after.push({x:clamp(522+gauss(r)*14,40,620),y:clamp(116+gauss(r)*12,40,410)});
+  for(let i=0;i<4;i++)after.push({x:60+r()*560,y:40+r()*370});
+  const gBe=el("g",{},top),gAf=el("g",{},top);
+  before.forEach(p=>el("circle",{cx:p.x,cy:p.y,r:4.6,fill:"var(--rep)"},gBe));
+  after.forEach(p=>el("circle",{cx:p.x,cy:p.y,r:4.6,fill:"var(--rep)"},gAf));
+  const near=(arr,cx,cy,R)=>arr.filter(p=>Math.hypot(p.x-cx,p.y-cy)<R).length;
+  const st={w:"before",lamp:false,A:false,B:false};
+  const s3=document.getElementById("s3");
+  function draw(){
+    const arr=st.w==="before"?before:after;
+    gBe.style.display=st.w==="before"?"":"none";gAf.style.display=st.w==="after"?"":"none";
+    patrol.style.display=st.w==="after"?"":"none";
+    gL.style.display=st.lamp?"":"none";gA.style.display=st.A?"":"none";gB.style.display=st.B?"":"none";
+    document.getElementById("actA").classList.toggle("show",st.A);document.getElementById("actB").classList.toggle("show",st.B);
+    s3.innerHTML=`<div>At the station<b>${near(arr,330,212,62)}</b></div><div>Mill Alley<b>${near(arr,442,332,50)}</b></div><div>All robberies<b>${arr.length}</b></div>`;
+  }
+  document.querySelectorAll("#seg3 button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("#seg3 button").forEach(x=>x.setAttribute("aria-pressed",x===b));st.w=b.dataset.w;draw();}));
+  const c=document.getElementById("tg3");
+  makeToggle(c,"Working streetlights",false,v=>{st.lamp=v;draw();});
+  makeToggle(c,"Model A",false,v=>{st.A=v;draw();});
+  makeToggle(c,"Model B",false,v=>{st.B=v;draw();});
+  draw();
+})();
+
+document.querySelectorAll("svg.map").forEach(m=>{if(m._labels)m.appendChild(m._labels);});
+document.querySelectorAll(".reveal").forEach(b=>b.addEventListener("click",()=>{const p=document.getElementById(b.getAttribute("aria-controls"));const v=!p.classList.contains("show");p.classList.toggle("show",v);b.setAttribute("aria-expanded",v);b.textContent=v?"Hide the discussion question":"Show the discussion question";}));
+})();
+</script>
+</body>
+</html>
